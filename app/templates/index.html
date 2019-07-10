@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content%}
+    <ul>
+        {% for item in seq %}
+        <li>{{ item.author }} says: {{ item.body }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
