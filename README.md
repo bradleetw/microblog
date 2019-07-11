@@ -183,3 +183,157 @@ def index():
     </ul>
 {% endblock %}
 ```
+
+## [Ch3: Web Forms](<https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms>)
+
+### Flask App 的配置
+
+Flask 有提供幾種方式來設定配置, 目前只先討論 2 種. [flask.config](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#configuration>).
+
+#### dictionary style of app.config
+透過 key/value 的方式來設定.
+```python
+    app.config['SECRET_KEY'] = 'dev'
+    app.config['DATABASE'] = os.path.join(app.instance_path, 'flaskr.sqlite')
+```
+
+#### [flask.config.from_mapping()](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#flask.Config.from_mapping>)
+
+```python
+    app.config.from_mapping(
+        SECRET_KEY='dev',
+        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+    )
+```
+
+#### [flask.config.from_pyfile()](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#flask.Config.from_pyfile>)
+
+透過另外的檔案來設定配置. 首先在 app 目錄下建立 `config.cfg` (檔名自定義), 其內容用 python 語法.
+
+```python
+SECRET_KEY = "devfortesting"
+PP_KEY_TESTING = "Just for testing."
+```
+
+載入 `config.cfg` 的方式, 也可以是絕對路徑, 若沒填就表示在`app/`底下:
+
+```python
+from flask import Flask
+app = Flask(__name__)
+app.config.from_pyfile('config.cfg')
+```
+
+#### [flask.config.from_json()](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#flask.Config.from_json>)
+
+另一種透過 json file 來設定配置的方法, 一樣在 app 目錄下建立 `config.json` (檔名自定義).
+
+```json
+{
+    "SECRET_KEY": "devfortesting",
+    "PP_KEY_TESTING": "Just for testing."
+}
+```
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+app.config.from_json('config.json')
+from app import routes
+```
+
+#### [flask.config.from_object()](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#flask.Config.from_object>)
+
+也可以直接透過 python 的 class, or module 來輸入配置設定. 
+
+##### module
+
+就像建立一個 python module 一樣的方式, 現在 `app` 下建立一個目錄, `default_cfg` (目錄名自定義), 並在此目錄下也建立 `__init__.py`, 然後在此檔案中引用如下:
+
+```python
+SECRET_KEY = "devfortesting"
+PP_KEY_TESTING = "Just for testing."
+```
+
+透過 from_object() 設定
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+app.config.from_object('app.default_cfg')
+from app import routes
+```
+
+##### class
+
+建立一個 class 如下:
+
+```python
+import os
+
+class Config(object):
+    '''
+    Flask app config class.
+    '''
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'devfortesting'
+
+    PP_KEY_TESTING = 'Just for testing.'
+```
+
+一樣利用 from_object 來導入配置.
+
+```python
+from flask import Flask
+from config import Config
+
+app = Flask(__name__)
+
+app.config.from_object(Config)
+
+from app import routes
+```
+
+## Others: Flask 提供的元件
+
+1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
+
+2. [URL Route Registration](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#url-route-registrations>) 
+
+3. [Class-Based Views](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#class-based-views>)
+
+4. [Signals](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#signals>)
+
+5. [Useful Internals](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#useful-internals>)
+
+6. [Stream Helpers](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#stream-helpers>)
+
+7. [Configuration](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#configuration>)
+
+8. [Template Rendering](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#template-rendering>)
+
+9. [Tagged JSON](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#tagged-json>)
+
+10. [JSON Support](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#module-flask.json>)
+
+11. [Message Flashing](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#message-flashing>)
+
+12. [Useful Functions and Classes](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#useful-functions-and-classes>)
+
+13. [Application Globals](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#application-globals>)
+
+14. [Test CLI Runner](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#test-cli-runner>)
+
+16. [Test Client](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#test-client>)
+
+17. [Session Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#session-interface>)
+
+18. [Sessions](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#sessions>)
+
+19. [Response Objects](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#response-objects>)
+
+20. [Incoming Request Data](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#incoming-request-data>)
+
+21. [Blueprint Objects](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#blueprint-objects>)
+
+22. [Application Object](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#application-object>)
