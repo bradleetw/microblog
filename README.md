@@ -1,5 +1,7 @@
 # Notes
 
+[Chapter 1: Hello World](</README_01.md>)
+
 ## [Chapter 1: Hello World](<https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world>)
 
 基本的架構如下
