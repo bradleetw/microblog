@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content%}
-    <ul>
-        {% for item in seq %}
-        <li>{{ item.author }} says: {{ item.body }}</li>
-        {% endfor %}
-    </ul>
+    <h1>Hi, {{ current_user.username }}!</h1>
+    {% for post in posts %}
+        <div>
+            <p>{{ post.author.username }} says: <b>{{ post.body }}</b></p>
+        </div>
+    {% endfor %}
 {% endblock %}
