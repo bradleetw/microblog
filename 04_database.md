@@ -80,7 +80,7 @@ class User(db.Model):
 
 對 SQL DB 而言, 每一次的結構更新或變更(尤其是在開發的過程)在沒有其他工具支持時, 只能額外寫個工具讀出再寫入. Alembic (Flask-Migrate) 解決了這個麻煩事, 他會紀錄每次資料庫結構的變更以及遷移腳本.
 
-Flask-migrate 提供一個 flask 子命令來管理這個 migration database.
+[Flask-migrate](<https://flask-migrate.readthedocs.io/en/latest/>) 提供一個 flask 子命令來管理這個 migration database.
 
 ```cmd
 flask db --help

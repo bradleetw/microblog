@@ -6,9 +6,9 @@
 
 ## [Ch4: Database](</04_database.md>)
 
-## CH5: [User Logins](</05_userLogin.md>)
+## [CH5: User Logins](</05_userLogin.md>)
 
-## CH6: [Profile Page and Avatars](</06_profilepage.md>)
+## [CH6: Profile Page and Avatars](</06_profilepage.md>)
 
 ## Others: Flask 提供的元件
 

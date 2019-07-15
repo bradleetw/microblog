@@ -145,7 +145,7 @@ class User(UserMixin, db.Model):
 flask db migrate -m "new fields in user model"
 ```
 
-這裡要再參考一下 Flask-Migrate, 了解一下 `new fields in user model` 的相關語法.
+`-m` 就是記錄這次 migrate 要寫下的註釋.
 
 接著執行 upgrade
 
@@ -171,4 +171,18 @@ flask db upgrade
     </table>
     ...
 {% endblock %}
+```
+
+### 記錄使用者最新一次拜訪的時間
+
+可以在每一個頁面都加上被 request 的當下時間, 但是這樣很麻煩, 可以透過 Flask 提供的 `@app.before_request` 來做到同樣的事.
+
+```python routes.py
+from datetime import datetime
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 ```
