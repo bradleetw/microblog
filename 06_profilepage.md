@@ -65,7 +65,7 @@ gravatar 提供的尺寸大小, 1 px 到 2048 px.
 
 給 User 增加一個方法可以直接回傳 gravatar URL.
 
-```python
+```python models.py
 from hashlib import md5
 # ...
 
@@ -79,7 +79,7 @@ class User(UserMixin, db.Model):
 
 將圖案整合到 user profile page:
 
-```html
+```html user.html
 {% extends "base.html" %}
 
 {% block content %}
@@ -95,5 +95,80 @@ class User(UserMixin, db.Model):
     {{ post.author.username }} says: <b>{{ post.body }}</b>
     </p>
     {% endfor %}
+{% endblock %}
+```
+
+### 將會共用的 template html page 分離出來
+
+接下來會在 index.html 的頁面中也渲染出 每一個 post, 所以將相關的分離出來到 `_post.html`, 然後利用 `jinja2` 的 `{% include '_post.html' %}` 來引入子頁面.
+
+```html _post.html
+    <table>
+        <tr valign="top">
+            <td><img src="{{ post.author.avatar(36) }}"></td>
+            <td>{{ post.author.username }} says:<br>{{ post.body }}</td>
+        </tr>
+    </table>
+```
+
+```html user.html
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        <tr valign="top">
+            <td><img src="{{ user.avatar(128) }}"></td>
+            <td><h1>User: {{ user.username }}</h1></td>
+        </tr>
+    </table>
+    <hr>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+{% endblock %}
+```
+
+### 增加資料庫 User table 的欄位
+
+對每一個 user profile 增加一個 `about me` 的自我描述欄位, 以及一個紀錄該使用者最近一次登入的時間.
+
+```python models.py
+class User(UserMixin, db.Model):
+    # ...
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+```
+
+因為資料庫的欄位結構變更, 所以要進行一次 [migration](</04_database.md#How-to-maintain-databse-migration>) 的動作.
+
+```cmd
+flask db migrate -m "new fields in user model"
+```
+
+這裡要再參考一下 Flask-Migrate, 了解一下 `new fields in user model` 的相關語法.
+
+接著執行 upgrade
+
+```cmd
+flask db upgrade
+```
+
+然後在 user profile page 裡再加上 `about me` & `last seen` 這兩個欄位的資料.
+
+```html user.html
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        <tr valign="top">
+            <td><img src="{{ user.avatar(128) }}"></td>
+            <td>
+                <h1>User: {{ user.username }}</h1>
+                {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+                {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
+            </td>
+        </tr>
+    </table>
+    ...
 {% endblock %}
 ```
