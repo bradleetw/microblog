@@ -69,11 +69,127 @@ def internal_error(error):
 from app import routes, models, errors
 ```
 
-
 ## Sending Errors by Email
+
+當 flask app 發生任何的 error 可以透過以下方式將 error report 透過郵件方式寄出.
+
+### 獲取系統的 mail server 資訊
+
+在 `config.py` 中讀取 mail server 的環境變數
+
+```python config.py
+class Config(object):
+    #...
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSOWRD')
+    ADMINS = ['brad.lee.tw@outlook.com']
+```
+
+如果系統中沒有 mail server (表示沒有 MAIL_SERVER 這個環境變數), 這個功能也就不執行.
+
+### 打包 log
+
+利用 Python's `logging` package 提供的 `SMTPHandler` 寄出郵件:
+
+```python __init__.py
+import logging
+from logging.handlers import SMTPHandler
+
+#...
+if not app.debug:
+    if app.config['MAIL_SERVER']:
+        auth = None
+        if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
+            auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+        secure = None
+        if app.config['MAIL_USE_TLS']:
+            secure = ()
+        mail_handler = SMTPHandler(
+            mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+            fromaddr='no-reply@' + app.config['MAIL_SERVER'],
+            toaddrs=app.config['ADMINS'],
+            subject='Microblog Failure',
+            credentials=auth,
+            secure=secure
+        )
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+```
+
+將相關的 mail server 資訊填入 `SMTPHandler` 後, 設定 logging level, 再將此物件透過 `flask.logger.addHandler()` 加入.
+
+這裡的設定是只有在 `FLASK_DEBUG` 關閉且系統存在 mail server, 此功能才有作用.
+
+### 如果開發的系統還沒有 mail server, 如何測試 ?
+
+有兩種方法:
+
+#### Python SMTP module
+
+利用 SMTP debuggin server 這個假郵件系統. 執行以下命令:
+
+```cmd
+python -m smtpd -n -c DebuggingServer localhost:8025
+```
+
+當然要將環境變數設成 `export MAIL_SERVER=localhost` & `export MAIL_PORT=8025`, 而且要 `export FLASK_DEBUG=0`
+
+#### 利用外部郵件系統
+
+這部分等部署到雲端後再來實驗.
 
 ## Logging to a File
 
+只透過郵件傳送 log 是不夠的, 我們需要完整紀錄 flask app 運行狀況. 透過 Python's `logging` package 提供的 `RotatingFileHandler` 來做.
+
+```python __init__.py
+from logging.handlers import SMTPHandler, RotatingFileHandler
+#...
+
+if not app.debug:
+    #...
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler(
+        'logs/microblog.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Microblog startup')
+```
+
 ## Fixing the Duplicate Username Bug
 
-##
+在 `EditProfileForm()` 中新增一個 validator , 用來判斷新輸入的 username 是否已經存在, 但必須額外先記錄原先的 usernmae.
+
+```python forms.py
+class EditProfileForm(FlaskForm):
+    username = StringField('User name', validators=[DataRequired()])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Submit')
+
+    def __init__(self, original_username, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
+
+    def validate_username(self, username):
+        if username.data != self.original_username:
+            user = User.query.filter_by(username=username.data).first()
+            if user is not None:
+                raise ValidationError('Please use a different username.')
+```
+
+```python routes.py
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    # ...
+```
