@@ -10,6 +10,8 @@
 
 ## [CH6: Profile Page and Avatars](</06_profilepage.md>)
 
+## [CH7: Error Handling](</07_errorhandling.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
