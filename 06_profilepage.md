@@ -175,7 +175,7 @@ flask db upgrade
 
 ### 記錄使用者最新一次拜訪的時間
 
-可以在每一個頁面都加上被 request 的當下時間, 但是這樣很麻煩, 可以透過 Flask 提供的 `@app.before_request` 來做到同樣的事.
+可以在每一個頁面都執行紀錄被 request 的當下時間功能, 但是這樣很麻煩, 因為會需要在每一個新的頁面功能建立時, 都要額外做這功能. 可以透過 Flask 提供的 `@app.before_request` 來在每一個 request function 之前執行同樣的事.
 
 ```python routes.py
 from datetime import datetime
@@ -186,3 +186,71 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 ```
+
+### 編輯 user profile
+
+建立一個讓使用者修改姓名, 自我描述的 form.
+
+```python forms.py
+from wtforms import StringField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Length
+
+# ...
+
+class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Submit')
+```
+
+```html edit_profile.h
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Edit Profile</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.about_me.label }}<br>
+            {{ form.about_me(cols=50, rows=4) }}<br>
+            {% for error in form.about_me.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+```
+
+```python routes.py
+from app.forms import EditProfileForm
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile',
+                           form=form)
+```
+
+在以上的代碼片段中, 會突然認為 `current_user.username` & `form.username` 是相同的類, 事實上:
+
+1. **current_user.username**: 這是 models.py 中 User.username (current_user 是一個 User 的 proxy), 是一個單純字符串
+
+2. **form.username**: forms.py 中的 EditProfileForm.username, 是一個 wtforms.StringField 物件, 所以要獲得裡面的資料就必須使用 form.username.data
