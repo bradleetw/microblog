@@ -26,13 +26,17 @@ if not app.debug:
             secure = ()
         mail_handler = SMTPHandler(
             mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
-            fromaddr='no-reply@' + app.config['MAIL_SERVER'],
+            fromaddr=app.config['MAIL_USERNAME'],
+            # fromaddr='no-reply@' + app.config['MAIL_SERVER'],
             toaddrs=app.config['ADMINS'],
             subject='Microblog Failure',
             credentials=auth,
-            secure=secure
-        )
+            secure=secure)
         mail_handler.setLevel(logging.ERROR)
+        mail_handler.setFormatter(
+            logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+            ))
         app.logger.addHandler(mail_handler)
 
     if not os.path.exists('logs'):
@@ -47,4 +51,3 @@ if not app.debug:
 
     app.logger.setLevel(logging.INFO)
     app.logger.info('Microblog startup')
-    
