@@ -84,7 +84,7 @@ class Config(object):
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSOWRD')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['brad.lee.tw@outlook.com']
 ```
 
@@ -137,9 +137,38 @@ python -m smtpd -n -c DebuggingServer localhost:8025
 
 當然要將環境變數設成 `export MAIL_SERVER=localhost` & `export MAIL_PORT=8025`, 而且要 `export FLASK_DEBUG=0`
 
-#### 利用外部郵件系統
+#### 利用外部郵件系統傳送郵件
 
-這部分等部署到雲端後再來實驗.
+##### 利用 QQ Mail 來當作郵件系統
+
+首先 QQ Mail 要打開 `POP3/SMTP` & `IMAP/SMTP` 這兩個服務.
+
+設定以下的資料到環境變數:
+
+- `MAIL_SERVER`: "smtp.qq.com"
+- `MAIL_PORT`: 587
+- `MAIL_USERNAME`: "brad.lee.tw@qq.com"
+- `MAIL_PASSWORD`: "授權碼"
+- `MAIL_USE_TLS`: 1
+
+特別注意 `MAIL_PASSWORD` 不是直接填入郵箱的密碼, 而是輸入在 QQ Mail server 獲得的授權碼, 這是和其他郵件系統不同的部分.
+
+另一個注意的是在 `SMTPHandler()` 中傳入的 `fromaddr` 參數, 在 QQ Mail 中必須要設成 `MAIL_USERNAME`, 不然就會發生 error.
+
+```python __init__.py
+#...
+if not app.debug:
+    #...
+        mail_handler = SMTPHandler(
+            mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+            fromaddr=app.config['MAIL_USERNAME'],
+            toaddrs=app.config['ADMINS'],
+            subject='Microblog Failure',
+            credentials=auth,
+            secure=secure
+        )
+        #...
+```
 
 ## Logging to a File
 
