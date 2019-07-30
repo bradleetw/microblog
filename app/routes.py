@@ -1,9 +1,11 @@
 from app import app, db
 from flask import render_template, redirect, flash, url_for, request
 from app.forms import LoginForm, RegistrationForm, EditProfileForm
+from app.forms import PostForm, UpdatePostForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Post
 from werkzeug.urls import url_parse
+from werkzeug.exceptions import abort
 from datetime import datetime
 
 
@@ -11,12 +13,7 @@ from datetime import datetime
 @app.route('/index')
 @login_required
 def index():
-    posts = [
-        {'author': {'username': 'James'},       'body': 'I am OK!'},
-        {'author': {'username': 'Brad lee'},    'body': 'Fine~~~'},
-        {'author': {'username': 'Vivian'},      'body': 'You are welcome'},
-        {'author': {'username': 'Andy'},        'body': 'No Problem!'}
-    ]
+    posts = Post.query.all()
     return render_template('index.html', title='Home Page', posts=posts)
 
 
@@ -63,13 +60,8 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [{
-        'author': user,
-        'body': 'Test post #1'
-    }, {
-        'author': user,
-        'body': 'Test post #2'
-    }]
+    posts = Post.query.filter_by(user_id=user.id)
+
     return render_template('user.html', user=user, posts=posts)
 
 
@@ -96,3 +88,53 @@ def edit_profile():
     return render_template('edit_profile.html',
                            title='Edit Profile',
                            form=form)
+
+
+@app.route('/create_post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title=form.title.data, body=form.body.data, user_id=current_user.id)
+        db.session.add(post)
+        db.session.commit()
+        flash('Congratulations, post is created!')
+        return redirect(url_for('index'))
+    return render_template('post/create_post.html', title='Create Post', form=form)
+
+
+@app.route('/update_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    post = get_post(id=post_id)
+    form = UpdatePostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.body = form.body.data
+        # post.timestamp = datetime.utcnow()
+        db.session.commit()
+        flash('Congratulations, post is updated!')
+        return redirect(url_for('index'))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.body.data = post.body
+    return render_template('post/update_post.html',
+                           title='Edit Post',
+                           form=form
+                           )
+
+
+@app.route('/delete/<int:post_id>', methods=('POST', ))
+@login_required
+def delete_post(post_id):
+    post = get_post(id=post_id)
+    db.session.delete(post)
+    db.commit()
+    return redirect(url_for('index'))
+
+
+def get_post(id, check_author=True):
+    post = Post.query.filter_by(id=id).first_or_404()
+    if check_author and post.author != current_user:
+        abort(403)
+    return post

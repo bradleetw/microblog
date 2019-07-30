@@ -5,9 +5,13 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, \
     Length
 from app.models import User
 
+
 class LoginForm(FlaskForm):
-    username = StringField(label='User Name', validators=[DataRequired(message='Need user name.')])
-    password = PasswordField(label='Password', validators=[DataRequired(message='Need password')])
+    username = StringField(
+        label='User Name',
+        validators=[DataRequired(message='Need user name.')])
+    password = PasswordField(
+        label='Password', validators=[DataRequired(message='Need password')])
     remember_me = BooleanField(label='Remember Me')
     submit = SubmitField(label='Sign In')
 
@@ -46,3 +50,18 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(username=username.data).first()
             if user is not None:
                 raise ValidationError('Please use a different username.')
+
+
+class PostForm(FlaskForm):
+    title = StringField('Post Title',
+                        validators=[DataRequired(message='Need Post title.')])
+    body = TextAreaField('Content', validators=[Length(min=0, max=140)])
+    submit = SubmitField('New Post')
+
+
+class UpdatePostForm(FlaskForm):
+    title = StringField('Post Title',
+                        validators=[DataRequired(message='Need Post title.')])
+    body = TextAreaField('Content', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Update')
+    # delete = SubmitField('Delete')
