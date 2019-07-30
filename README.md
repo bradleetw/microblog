@@ -12,6 +12,8 @@
 
 ## [CH7: Error Handling](</07_errorhandling.md>)
 
+## [CH8: Followers](</08_followers.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
