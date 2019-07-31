@@ -13,7 +13,7 @@ from datetime import datetime
 @app.route('/index')
 @login_required
 def index():
-    posts = Post.query.all()
+    posts = current_user.followed_posts()
     return render_template('index.html', title='Home Page', posts=posts)
 
 

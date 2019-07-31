@@ -92,18 +92,138 @@ class User(UserMixin, db.Model):
 
 除了在 User 中增加 `follow()` & `unfollow()` 外, 多新增 `is_following()` 來判斷使否關注過另一個使用者.
 
+## 將粉絲機制整合到應用中
+
+在 Flask 應用中增加兩個功能: `follow` & `unfollow`. 直接利用在 models.py 中的 User.follow(user) & User.unfollow(user) 實現. 要特別注意的是根據 username 來獲取 User 實體時要做的錯誤處理.
+
+```python routes.py
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(f'User {username} not found.')
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('You cannot follow yourself!')
+        return redirect(url_for('user', username=username))
+    current_user.follow(user)
+    db.session.commit()
+    flash(f'You are following {username}')
+    return redirect(url_for('user', username=username))
+```
+
+```python routes.py
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(f'User {username} not found.')
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('You cannot unfollow yourself!')
+        return redirect(url_for('user', username=username))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash(f'You are not following {username}')
+    return redirect(url_for('user', username=username))
+```
+
+功能完善後, 接著調整 User Profile Page:
+
+1. 呈現粉絲人數的數量, 及關注的數量.
+
+2. 增加給使用者點擊 follow/unfollow 的 item.
+
+```html user.html
+        ...
+        <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+
+        {% if user == current_user %}
+            <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
+        {% elif not current_user.is_following(user) %}
+            <p><a href="{{ url_for('follow', username=user.username) }}">Follow</a></p>
+        {% else %}
+            <p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p>
+        {% endif %}
+        ...
+```
+
 ## 獲取關注用戶的動態
 
+增加粉絲和被關注者關係的功能, 還不夠有趣. 做到呈現所感興趣的使用者的動態, 這個功能更有趣.
 
+而要如何呈現這些動態就是這段要探討的主題 - 要如何撈取(query) Post table 這個資料表?
 
-## 聯合查詢
+首先可以透過 `user.followed.all()` 獲取所有我們關注的名單, 然後再來獲取所有被關注者的 Post. 假設關注了 1000 個使用者, 則需要對資料庫做 1000 的獲取 post 的動作以獲得所有感興趣的 posts. 再將這所有的 posts 合併排序(存在 memory中), 假若已完成`分頁`功能, 則接著再分段呈現出來. 這些動作若沒有透過 relational database 所提供的功能, 則非常沒有效率.
 
-## filter
+主要是透過 `join()`, `filter()`, `order_by()` 這三個 function 來做到以上的事:
 
-## 排序
+- **join()**: 將資料庫中的表格關聯起來
 
-## 將所有的關注者及自身的動態呈現出來
+- **filter()**: 將符合條件的資料篩選出來
+
+- **order_by()**: 照時間順序排序
+
+### 聯合查詢
+
+我們要找出我們有關注的使用者的 Posts, 所以須先將 Post table 和 association table - followers 做連結, 所以條件是 `followers.followed_id == Post.user_id`:
+
+```python 
+followed = Post.query.join(followers, (followers.followed_id == Post.user_id))
+```
+
+所得到的 `followed` 就是依照 `Post.user_id` & `followers.followed_id` 必須相等的條件連結出來的大表格.
+
+如果今天是要找粉絲的動態, 就要參考如下改法, 將 `followers.followed_id` 換成 `followers.follower_id`:
+
+```python
+followed = Post.query.join(followers, (followers.follower_id == Post.user_id))
+```
+
+### filter
+
+要呈現該登入使用者所有關注的所有動態, 也就是從上面 join 後的大表中, 查找粉絲欄位(followers.follower_id)是該登入使用者的 id (self.id):
+
+```python
+    def followed_posts(self):
+        followed = Post.query.join(
+            followers, (followers.followed_id == Post.user_id)).filter(
+                followers.follower_id == self.id)
+```
+
+### 排序
+
+由於我們是要依據所有 Posts 被建立的時間來呈現, 所以要挑選 `Post.timestamp` 來當作排序的 index. 
+
+```python
+    def followed_posts(self):
+        followed = Post.query.join(
+            followers, (followers.followed_id == Post.user_id)).filter(
+                followers.follower_id == self.id).order_by(
+                    Post.timestamp.desc()
+                )
+```
+
+### 將所有的關注者及自身的動態呈現出來
+
+前面只有將被關注者的動態呈現出來, 但看不到使用者本身的動態(因為使用者自己無法關注自己), 為了也一起呈現使用者本身的動態資料, 所以必須額外查找使用者本身的 Post.
+
+```python
+own = Post.query.filter_by(user_id=self.id)
+```
+
+找到後再和前面所找到資料透過 `union()` 合併.
+
+```python
+    def followed_posts(self):
+        followed = Post.query.join(
+            followers, (followers.c.followed_id == Post.user_id)).filter(
+                followers.c.follower_id == self.id)
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Post.timestamp.desc())
+```
 
 ## Unit Testing
 
-## 將粉絲機制整合到應用中
