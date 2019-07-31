@@ -34,17 +34,15 @@
 要注意 `er` and `ed` 的差別, 很容易搞錯.
 
 ```python models.py
-class User(UserMixin, db.Model):
-    #...
-    followers = db.Table(
-        'followers',
-        db.Column('follower_id', db.Integer, db.ForeignKey("user.id")),
-        db.Column('followed_id', db.Integer, db.ForeignKey("user.id")))
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey("user.id")),
+    db.Column('followed_id', db.Integer, db.ForeignKey("user.id")))
 ```
 
 因為該 `association table` 是輔助用, 並沒有額外紀錄其他的資料, 除了 `ForeignKey`, 所以就沒有採用 `User` & `Post` 一樣的方式繼承 `db.Model`, 而是直接建立 `db.Table()`, 並用 followers 來命名.
 
-我們利用 User.followers 來記錄 `followers` 這個 association table, 會讓我誤會該語意描述著每一個 User 都有自己獨立的 `followers` table, 所以該系統會存在ㄧ個 User table, 一個 Post table, 以及多個 followers table (有多少個 User 就會有多少個 followers table), 但這是錯的.
+~~我們利用 User.followers 來記錄 `followers` 這個 association table, 會讓我誤會該語意描述著每一個 User 都有自己獨立的 `followers` table, 所以該系統會存在ㄧ個 User table, 一個 Post table, 以及多個 followers table (有多少個 User 就會有多少個 followers table), 但這是錯的.~~
 
 系統中只會有 3 個 table, User, Post, and followers 這三個.
 
