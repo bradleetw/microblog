@@ -227,3 +227,24 @@ own = Post.query.filter_by(user_id=self.id)
 
 ## Unit Testing
 
+透過 python unittest package, 來編寫一些單元測試. 在 unittest framework 中 `setUp()` & `tearDown()` 分別會在單元測試開始前, 結束後執行的動作. 在這個單元測試, 主要是會對資料庫做測試, 為了避免和原有的資料庫衝突, 所以執行 `app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'` 將資料庫的配置改成 `sqlite://`. 以下是原代碼的資料庫配置
+
+```python
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'app.db')
+```
+
+單元測試完後再將所有的資料清空:
+
+```python
+class UserModelCase(unittest.TestCase):
+    def setUp(self):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        db.create_all()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+```
+
+在命令列下執行 `$ python tests.py`. 維持單元測試的編寫是好的習慣.
