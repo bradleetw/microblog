@@ -13,8 +13,19 @@ from datetime import datetime
 @app.route('/index')
 @login_required
 def index():
-    posts = current_user.followed_posts()
-    return render_template('index.html', title='Home Page', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    posts = current_user.followed_posts().paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('index',
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('index',
+                       page=posts.prev_num) if posts.has_prev else None
+
+    return render_template('index.html',
+                           title='Home Page',
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -60,9 +71,19 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(user_id=user.id)
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.filter_by(user_id=user.id).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('user', username=username,
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('user', username=username,
+                       page=posts.prev_num) if posts.has_prev else None
 
-    return render_template('user.html', user=user, posts=posts)
+    return render_template('user.html',
+                           user=user,
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)
 
 
 @app.before_request
@@ -86,8 +107,8 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html',
-                            title='Edit Profile',
-                            form=form)
+                           title='Edit Profile',
+                           form=form)
 
 
 @app.route('/create_post', methods=['GET', 'POST'])
@@ -95,12 +116,16 @@ def edit_profile():
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, body=form.body.data, author=current_user)
+        post = Post(title=form.title.data,
+                    body=form.body.data,
+                    author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Congratulations, post is created!')
         return redirect(url_for('index'))
-    return render_template('post/create_post.html', title='Create Post', form=form)
+    return render_template('post/create_post.html',
+                           title='Create Post',
+                           form=form)
 
 
 @app.route('/update_post/<int:post_id>', methods=['GET', 'POST'])
@@ -119,9 +144,8 @@ def update_post(post_id):
         form.title.data = post.title
         form.body.data = post.body
     return render_template('post/update_post.html',
-                            title='Edit Post',
-                            form=form
-                            )
+                           title='Edit Post',
+                           form=form)
 
 
 @app.route('/delete/<int:post_id>', methods=('POST', ))
@@ -170,3 +194,21 @@ def unfollow(username):
     db.session.commit()
     flash(f'You are not following {username}')
     return redirect(url_for('user', username=username))
+
+
+@app.route('/explore')
+@login_required
+def explore():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('explore',
+                       page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('explore',
+                       page=posts.prev_num) if posts.has_prev else None
+
+    return render_template('index.html',
+                           title='Explore Page',
+                           posts=posts.items,
+                           next_url=next_url,
+                           prev_url=prev_url)

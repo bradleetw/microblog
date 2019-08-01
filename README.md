@@ -14,6 +14,8 @@
 
 ## [CH8: Followers](</08_followers.md>)
 
+## [CH9: Pagination](</09_pagination.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
