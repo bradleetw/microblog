@@ -95,7 +95,7 @@ def edit_profile():
 def create_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, body=form.body.data, user_id=current_user.id)
+        post = Post(title=form.title.data, body=form.body.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Congratulations, post is created!')
