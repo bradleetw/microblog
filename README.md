@@ -16,6 +16,8 @@
 
 ## [CH9: Pagination](</09_pagination.md>)
 
+## [CH10: Email support](</10_emailsupport.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
