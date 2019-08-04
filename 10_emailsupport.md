@@ -180,3 +180,143 @@ The Microblog Team
 <p>The Microblog Team</p>
 ```
 
+## 基本版本的問題
+
+上面的動作已經完成發送 reset password email, 重設 password 的功能.
+
+但目前的功能存在很大問題, 重置密碼鏈結是 `http://127.0.0.1:5000/reset_password/username`, 也就是一般的使用者可以不用等到收到郵件, 只要直接將鏈結的後綴改成任意的使用者名稱, 就可以直接更改任意的使用者密碼.
+
+所以接著要將後綴的使用者名稱的設計, 改成將使用者名稱加密的方法. 此處介紹了 [**Json Web Toekn**](<https://jwt.io/>) (JWT) 業界常用的方式, 應用在 Single Sign On. 
+簡單來說就是將輸入的 JSON 資料, 經過私密鑰匙的處理後產生的一串亂碼字串, 收到該字串後, 再依照原私密鑰匙即可恢復得到 JSON 資料.
+
+雖然是一串亂碼, 但還是很容易被解讀 JSON 資料出來, 例如透過 [JWT Debgger](<https://jwt.io/#debugger>) 就可以看到.
+所以若再傳送的過程中被其他駭客攔截更改, 只要私密鑰匙被猜到, 就會像基本版本一樣, 輕易的被駭客搞爛系統, 將所有的使用者密碼變更. 所以這個方法的保護等級取決於私密鑰匙的等級.
+
+### [Pyjwt package](<https://pyjwt.readthedocs.io/en/latest/index.html>)
+
+JWT 提供了很多語言的 Package, 如: Python, Java, Go, .Net, ... 這裡選擇 Python version , [Pyjwt](<https://github.com/jpadilla/pyjwt/>).
+
+```command
+pip install pyjwt
+```
+
+### 透過 jwt 執行加密 & 解密
+
+Pyjwt package 主要會用到的是 `encode()` & `decode()` 這兩個功能.
+
+基本的使用方法如下:
+
+```python
+import jwt
+token = jwt.encode({'A': 'B'}, 'myprivatekey', algorithm='HS256')
+tmp = jwt.decode(token, 'myprivatekey', algorithm='HS256')
+```
+
+**jwt.encode** 第一個參數, 直接放入 JSON 型態的資料, 而 **jwt.decode** 第一個參數則是傳入 encode 後的 token.
+
+第二個參數傳入 private key, 在 Flask app 的應用中, 我們可以直接用 `app.config['SECRET_KEY']`.
+
+第三個參數傳入使用編碼的種類, 這裡直接使用 `HS256`, [其他種類](<https://pyjwt.readthedocs.io/en/latest/algorithms.html>).
+
+#### 超時失效
+
+JWT 的[定義](<https://www.iana.org/assignments/jwt/jwt.xhtml>)中, enocde 第一個參數的 JSON 除了可以放入要傳輸的資料, 也定義了一些特定功能的參數, 這裡只說明常用的**超時失效**.
+
+只要多加入一組 `'exp': time`, 當在 jwt.decode() 時會直接判斷時間有無超時. 這是最常用的設定.
+
+## 鏈結加密版本
+
+原本的版本的重置密碼鏈結是 `http://127.0.0.1:5000/reset_password/username`, 這裡將 `username` 改成 `user.id`. 
+
+接著是在 User 增加 `get_reset_password_token()` & `verify_reset_password_token()`.
+
+### encode reset password url
+
+傳入超時的時間間隔 expires_in:
+
+```python models.py
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {
+                'reset_password': self.id,
+                'exp': time() + expires_in
+            },
+            app.config['SECRET_KEY'],
+            algorithm='HS256').decode('utf-8')
+```
+
+要特別注意的是, jwt.encode() 所產生的字串要再將其轉成 `utf-8`.
+
+### decode reset password url
+
+```python models.py
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithm='HS256')['reset_password']
+        except:
+            return
+        return User.query.get(id)
+```
+
+將依獲得的 user.id 查找 User.
+
+### 更改 email.py 種的 send_password_reset_email()
+
+獲得 token 字串, 超時時間設定為 5 分鐘, 並傳入郵件中
+
+```python email.py
+def send_password_reset_email(user):
+    token = user.get_reset_password_token(expires_in=300)
+    send_email('[Microblog] Reset your password',
+               sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               text_body=render_template(
+                   'email/reset_password.txt',
+                   user=user,
+                   token=token),
+               html_body=render_template(
+                   'email/reset_password.html',
+                   user=user,
+                   token=token))
+```
+
+### 依據 token 更改 reset_password.txt & reset_password.html 中的鏈結
+
+```html reset_password.html
+<!-- ... -->
+    To reset your password
+    <a href="{{ url_for('reset_password', token=token, _external=True) }}">
+        click here
+    </a>.
+</p>
+<p>Alternatively, you can paste the following link in your browser's address bar:</p>
+<p>{{ url_for('reset_password', token=token, _external=True) }}</p>
+<!-- ... -->
+```
+
+```text reset_password.txt
+...
+To reset your password click on the following link:
+
+{{ url_for('reset_password', token=token, _external=True) }}
+
+If you have not requested a password reset simply ignore this message.
+...
+```
+
+### 更改 routes.py 中的 reset_password()
+
+改成接收 token, 並透過 `User.verify_reset_password_token()` 解譯出 user instance.
+
+```python routes.py
+@app.route('/reset_password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
+    # ...
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    # ...
+```
+
