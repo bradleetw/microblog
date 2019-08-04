@@ -232,11 +232,11 @@ def reset_password_request():
     return render_template('reset_password_request.html', title='Reset Password', form=form)
 
 
-@app.route('/reset_password/<username>', methods=['POST', 'GET'])
-def reset_password(username):
+@app.route('/reset_password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    user = User.query.filter_by(username=username).first_or_404()
+    user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('index'))
     form = ResetPasswordForm()
