@@ -151,6 +151,8 @@ def send_password_reset_email(user):
 
 特別解釋郵件的內容, 分別填入 text & html 格式, 經由 `render_template()` 將使用者的資訊填入.
 
+特別注意 `url_for(..., _external=True)`, 其中的 `_external` 表示轉換出來的 url 會加上 Base URL.
+
 ```text reset_password.txt
 Dear {{ user.username }},
 
@@ -318,5 +320,25 @@ def reset_password(token):
     if not user:
         return redirect(url_for('index'))
     # ...
+```
+
+## 異步傳送郵件
+
+傳送郵件所花的時間較長, 如果同一個時間有多個用戶會導致系統被拖慢, 所以利用異步的方式讓郵件傳送在背景進行.
+
+```python email.py
+# ...
+from threading import Thread
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+def send_email(subject, sender, recipients, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = text_body
+    msg.html = html_body
+    mail.send(msg)
+    Thread(target=send_async_email, args=(app, msg)).start()
 ```
 
