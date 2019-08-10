@@ -1,42 +1,42 @@
+{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/pagination.html' import render_pagination%}
 {% extends "base.html" %}
 
 {% block content %}
-    <table>
-        <tr valign="top">
-            <td><img src="{{ user.avatar(128) }}"></td>
-            <td>
-                <h1>User: {{ user.username }}</h1>
-                {% if user.about_me %}
-                    <p>{{ user.about_me }}</p>
-                {% endif %}
-                {% if user.last_seen %}
-                    <p>Last seen on: {{ user.last_seen.strftime('%Y-%m-%d %H:%M') }}</p>
-                {% endif %}
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <table>
+                <tr valign="top">
+                    <td><img src="{{ user.avatar(128) }}"></td>
+                    <td>
+                        <h1 class="display-4">User: {{ user.username }}</h1>
+                        {% if user.about_me %}
+                        <p class="lead">{{ user.about_me }}</p>
+                        {% endif %}
+                
+                        {% if user.last_seen %}
+                        <p>Last seen on: {{ user.last_seen.strftime('%Y-%m-%d %H:%M') }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            <hr class="my-4">
+            <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+            
+            {% if user == current_user %}
+                <a class="btn btn-primary btn-lg" href="{{ url_for('edit_profile') }}" role="button">Edit your profile</a>
+            {% elif not current_user.is_following(user) %}
+                <a class="btn btn-primary btn-lg" href="{{ url_for('follow', username=user.username) }}" role="button">Follow</a>
+            {% else %}
+                <a class="btn btn-primary btn-lg" href="{{ url_for('unfollow', username=user.username) }}" role="button">Unfollow</a>
+            {% endif %}
+        </div>
+    </div>
 
-                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
-
-                {% if user == current_user %}
-                    <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
-                {% elif not current_user.is_following(user) %}
-                    <p><a href="{{ url_for('follow', username=user.username) }}">Follow</a></p>
-                {% else %}
-                    <p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
     <hr>
-    {% for post in posts %}
-        {% include '_post.html' %}
-        {% if current_user == post.author %}
-        <a class="action" href="{{ url_for('update_post', post_id=post.id) }}">Edit</a>
-        {% endif %}
-        <hr>
-    {% endfor %}
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer Posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older Posts</a>
+
+    {% if posts %}
+    {% include '_post.html' %}
+    {{ render_pagination(pagination, align='center') }}
     {% endif %}
 {% endblock %}

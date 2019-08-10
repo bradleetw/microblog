@@ -1,39 +1,76 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>
-        {% if title %}
+    {% block head %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>
+            {% if title %}
             {{ title }} - Microblog
-        {% else %}
+            {% else %}
             Welcome to Microblog
-        {% endif %}
-    </title>
+            {% endif %}
+        </title>
+    {% endblock %}
+    <link href="/static/navbar.css" rel="stylesheet">
+    {% block styles %}
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css(version='4.3.1') }}
+    {% endblock %}
 </head>
 <body>
-    <div>Microblog: 
-        <a href="{{ url_for('index') }}">Home</a>
-        {% if current_user.is_anonymous %}
-        <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-        <a href="{{ url_for('explore') }}">Explore</a>
-        <a href="{{ url_for('create_post') }}">New Post</a>
-        <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+    <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark navbar-margin">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="/static/frog.svg" width="30" height="30" alt="">
+                MicroBlog
+            </a>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    {{ render_nav_item('index', 'Home', use_li=True) }}
+                    {{ render_nav_item('explore', 'Explore', use_li=True) }}
+                    
+                    {% if not current_user.is_anonymous %}
+                        {{ render_nav_item('user', 'Profile', use_li=True, username=current_user.username) }}
+                        {{ render_nav_item('create_post', 'New Post', use_li=True) }}
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="navbar">
+                <ul class="navbar-nav">
+                    {% if current_user.is_anonymous %}
+                        {{ render_nav_item('login', 'Login', use_li=True) }}
+                    {% else %}
+                        {{ render_nav_item('logout', 'Logout', use_li=True) }}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
     </div>
-    <hr> 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
+
+    {% block scripts %}
+        <!-- Optional JavaScript -->
+        {{ bootstrap.load_js(version='4.3.1', jquery_version='3.3.1', popper_version='1.14.0', with_jquery=True, with_popper=True) }}
+    {% endblock %}
 </body>
 </html>

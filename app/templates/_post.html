@@ -1,7 +1,22 @@
-<table>
-    <tr valign="top">
-        <td><img src="{{ post.author.avatar(36) }}"></td>
-        <td>{{ post.author.username }} says:</td>
-        <td>[{{ post.title }}]<br>{{ post.body }}</td>
-    </tr>
-</table>
+<div class="container">
+    <div class="row pt-2 mb-5">
+        <div class="col-12 pr-xl-3 pt-md-3">
+            {% for post in posts %}
+                <div class="card rounded border-2 shadow-lg mb-5">
+                    <div class="card-body p-4">
+                        <h5 class="card-title">
+                            <img src="{{ post.author.avatar(32) }}" alt="{{ post.author.username }}">
+                            {{ post.title }}
+                        </h5>
+                        <p class="card-text">{{ post.body }}
+                            {% if current_user == post.author %}
+                            <a class="card-link" href="{{ url_for('update_post', post_id=post.id) }}">Edit</a>
+                            {% endif %}
+                            <p class="card-text text-right"><small
+                                    class="text-muted">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

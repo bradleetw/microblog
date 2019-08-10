@@ -1,24 +1,15 @@
+{% from 'bootstrap/pagination.html' import render_pagination%}
 {% extends "base.html" %}
 
 {% block content%}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    {% for post in posts %}
-        <div>
-            <h3>{{ post.title }}</h3>
-            <div>
-                by <a href="{{ url_for('user', username=post.author.username) }}">{{ post.author.username }}</a> on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
-            </div>
+    <div class="py-3 text-center">
+        <h2>{{ title }}</h2>
+        <h1>Hi, {{ current_user.username }}!</h1>
+    </div>
 
-            {% if current_user == post.author %}
-                <a class="action" href="{{ url_for('update_post', post_id=post.id) }}">Edit</a>
-            {% endif %}
-        </div>
-        <hr>
-    {% endfor %}
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer Posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older Posts</a>
+    <hr>
+    {% if posts %}
+    {% include '_post.html' %}
+    {{ render_pagination(pagination, align='center') }}
     {% endif %}
 {% endblock %}
