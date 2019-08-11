@@ -168,6 +168,8 @@ class LoginForm(FlaskForm):
 
 比較特別的是 `{{ form.hidden_tag() }}` 這一句, 主要是為了避免這個 form 遭受 CSRF 的攻擊. 而這是 `Flask-WTF` 所提供的功能.
 
+可參閱 [flask-wtf quick start](<https://flask-wtf.readthedocs.io/en/stable/quickstart.html#creating-forms>).
+
 ### Render views
 
 再加上 `login()`, 並在其內將 `LoginForm` 生成, 並透過 `render_template()` 和 html 做連接. 如此一個 user login page 就完成了.
