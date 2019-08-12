@@ -7,6 +7,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <title>
             {% if title %}
             {{ title }} - Microblog
@@ -15,14 +16,15 @@
             {% endif %}
         </title>
     {% endblock %}
-    <link href="/static/navbar.css" rel="stylesheet">
+    <!-- <link href="static/navbar.css" rel="stylesheet"> -->
     {% block styles %}
     <!-- Bootstrap CSS -->
     {{ bootstrap.load_css(version='4.3.1') }}
     {% endblock %}
 </head>
-<body>
-    <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-dark navbar-margin">
+<!-- <body style="padding-top: 0"> -->
+<body style="padding-top: 0">
+    <nav class="navbar navbar-expand-md sticky-top navbar-dark bg-primary">
         <div class="container">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

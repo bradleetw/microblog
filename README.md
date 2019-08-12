@@ -18,6 +18,8 @@
 
 ## [CH10: Email support](</10_emailsupport.md>)
 
+## [CH11: Facelift](</11_facelift.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)

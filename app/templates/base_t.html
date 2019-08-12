@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet">
+    
+<!-- FontAwesome JS-->
+<script defer src="{{ url_for('static', filename='assets/fontawesome/js/all.min.js') }}"></script>
+
+<!-- Theme CSS -->
+<link id="theme-style" rel="stylesheet" href="{{ url_for('static', filename='assets/css/theme.css') }}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='assets/plugins/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/plugins/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/plugins/bootstrap/js/bootstrap.min.js' )}}"></script>
+{% endblock %}
