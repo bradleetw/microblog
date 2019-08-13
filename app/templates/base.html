@@ -30,7 +30,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <a class="navbar-brand" href="{{ url_for('index') }}">
-                <img src="/static/frog.svg" width="30" height="30" alt="">
+                <img src="{{ url_for('static', filename='frog.svg') }}" width="30" height="30" alt="">
                 MicroBlog
             </a>
             
