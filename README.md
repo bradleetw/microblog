@@ -20,6 +20,8 @@
 
 ## [CH11: Facelift](</11_facelift.md>)
 
+## [CH12: Dates and times](</12_dateandtime.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
