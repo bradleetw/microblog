@@ -12,8 +12,11 @@
                             {% if current_user == post.author %}
                             <a class="card-link" href="{{ url_for('update_post', post_id=post.id) }}">Edit</a>
                             {% endif %}
-                            <p class="card-text text-right"><small
-                                    class="text-muted">{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                            <p class="card-text text-right">
+                                <small class="text-muted">
+                                    {{ moment(post.timestamp).fromNow() }}
+                                </small>
+                            </p>
                     </div>
                 </div>
             {% endfor %}

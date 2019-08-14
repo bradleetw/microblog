@@ -74,5 +74,8 @@
         <!-- Optional JavaScript -->
         {{ bootstrap.load_js(version='4.3.1', jquery_version='3.3.1', popper_version='1.14.0', with_jquery=True, with_popper=True) }}
     {% endblock %}
+    <!-- {{ moment.include_jquery() }} -->
+    {{ moment.include_moment() }}
+    {{ moment.locale(auto_detect=True) }}
 </body>
 </html>
