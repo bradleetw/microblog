@@ -102,6 +102,7 @@ class Config(object):
 假若 endpoint 對應的 route 是像 `/user/<username>`, 則可以直接加上新的參數 `username='brad'`, `{{ render_nav_item('user', 'Profile', use_li=True, username=current_user.username) }}`.
 
 ```html base.html
+{% from 'bootstrap/nav.html' import render_nav_item %}
 <!-- ... -->
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
@@ -181,6 +182,9 @@ def user(username):
 填入 `render_pagination()`
 
 ```html user.html
+{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/pagination.html' import render_pagination%}
+
 <!-- ... -->
     {% if posts %}
     {% include '_post.html' %}
@@ -227,3 +231,17 @@ def user(username):
 注意的是 href\src 的使用, `{{ url_for('static', filename='assets/fontawesome/js/all.min.js') }}`
 
 如此就可以快速更換 style.
+
+## 使用 Bootstrap-Flask macro 的可能問題
+
+Bootstrap-Flask 提供的四組 template macro 可以幫忙減少很多的代碼量, 而且也很方便導入, 只要在 html template 的開頭加上 `{% from 'bootstrap/form.html' import render_form %}` 就可使用. 
+
+在開始學習使用時並沒有遇到其他問題, 也就沒有對 `from 'bootstrap/form.html` 產生太多的疑問. 什麼疑問？就是在運行過程是如何找到 `bootstrap/form.html` 這個檔案. 
+
+這四個檔案 form.html, nav.html, pagination.html, and utils.html 隨著 **Bootstrap-Flask** 的安裝路徑, 被放在 `/site-packages/bootstrap-flask/flask_bootstrap/templates/bootstrap` 這個路徑裡.
+
+原本一切運行正常也就不特別關切這問題, 直到為了要找另一個問題不得不將 flask 相關的 packages 的源碼下載下來, 安裝在 python 3.7.4 的環境下, 只要相關的環境變數設定正確, 直接在命列下執行 `flask run` 都會正常運行. 但是轉到 VSCode 進行 debugging 就會遇到 `Template not found` 的 exception, 就是指向 Bootstrap_flask 這四個檔案.
+
+透過網路的搜尋找不到解答, 只好在 **Jinja** package 中打上 log, 透過命令列運行觀察. 發現當解析到這四個檔案時, jinja 都要找兩次才找到該檔, 第一次的搜索路徑是找本 project 底下的 templates 目錄, 加上 `bootstrap/form.html`, 當然找不到, 然後就會直接丟出一個 `Template Not Found Exception`, 在 VSCode debugging mode 下此時就卡在這, 而命令列環境下則還會依照另一個搜索路徑, 此時就會找到. 但是不是很確定第二次所用的搜索路徑是如何設定, 猜測是在 Bootstrap-Flask 的 __init__.py 裡, 透過 `Blueprint()` 設定. 而且當第一次找不時丟出 Exception, 是在什麼地方攔到, 並而執行第二次的搜索動作, 這個也不清楚.
+
+後來將這四個檔案直接拷貝一份放在 project 下面的 `templates/bootstrap/` 中, 相關的問題就不見了, 我也有印象曾經在網路看到某人也是做同樣操作, 我猜可能也遇到相關問題. 建議若要使用這四個檔案就拷貝一份到該專案中.
