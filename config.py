@@ -21,3 +21,4 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['brad.lee.tw@qq.com']
     POSTS_PER_PAGE = 4
+    LANGUAGES = ['zh_tw', 'en', 'zh_cn']

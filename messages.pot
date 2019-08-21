@@ -1,0 +1,392 @@
+# Translations template for PROJECT.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-08-19 16:07+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: app/__init__.py:21
+msgid "Please log in to access this page!"
+msgstr ""
+
+#: app/forms.py:13
+msgid "User Name"
+msgstr ""
+
+#: app/forms.py:14
+msgid "Need user name."
+msgstr ""
+
+#: app/forms.py:15 app/forms.py:36 app/forms.py:76
+msgid "Please input user name"
+msgstr ""
+
+#: app/forms.py:17 app/forms.py:44 app/forms.py:138
+msgid "Password"
+msgstr ""
+
+#: app/forms.py:18
+msgid "Need password"
+msgstr ""
+
+#: app/forms.py:19 app/forms.py:46 app/forms.py:140
+msgid "Please input password"
+msgstr ""
+
+#: app/forms.py:20
+msgid "Remember Me"
+msgstr ""
+
+#: app/forms.py:21 app/routes.py:46
+msgid "Sign In"
+msgstr ""
+
+#: app/forms.py:26 app/forms.py:66
+msgid "User name"
+msgstr ""
+
+#: app/forms.py:28 app/forms.py:68
+msgid "User name is must"
+msgstr ""
+
+#: app/forms.py:32 app/forms.py:72
+msgid "Must be at least 6 characters, at most 64 characters."
+msgstr ""
+
+#: app/forms.py:35 app/forms.py:75
+msgid "Please input User name between 6 ~ 64 characters."
+msgstr ""
+
+#: app/forms.py:38 app/forms.py:128
+msgid "Email"
+msgstr ""
+
+#: app/forms.py:39 app/forms.py:129
+msgid "Email address is must"
+msgstr ""
+
+#: app/forms.py:41 app/forms.py:131
+msgid "Please input email address under 120 length."
+msgstr ""
+
+#: app/forms.py:42 app/forms.py:132
+msgid "Please input email address"
+msgstr ""
+
+#: app/forms.py:45 app/forms.py:139
+msgid "Password is must"
+msgstr ""
+
+#: app/forms.py:48 app/forms.py:142
+msgid "Repeat Password"
+msgstr ""
+
+#: app/forms.py:50 app/forms.py:144
+msgid "Please input password again"
+msgstr ""
+
+#: app/forms.py:51 app/routes.py:67
+msgid "Register"
+msgstr ""
+
+#: app/forms.py:56 app/forms.py:92
+msgid "Please use a different username."
+msgstr ""
+
+#: app/forms.py:61
+msgid "Please use a different email address."
+msgstr ""
+
+#: app/forms.py:78
+msgid "About me"
+msgstr ""
+
+#: app/forms.py:79 app/forms.py:106 app/forms.py:119
+msgid "Must be at most 140 characters"
+msgstr ""
+
+#: app/forms.py:80 app/forms.py:107 app/forms.py:120
+msgid "Please input post content under 140 length."
+msgstr ""
+
+#: app/forms.py:81
+msgid "Please input self-content"
+msgstr ""
+
+#: app/forms.py:82
+msgid "Submit"
+msgstr ""
+
+#: app/forms.py:96 app/forms.py:113
+msgid "Post Title"
+msgstr ""
+
+#: app/forms.py:98 app/forms.py:114
+msgid "Need Post title."
+msgstr ""
+
+#: app/forms.py:100
+msgid "Must be at most 64 characters"
+msgstr ""
+
+#: app/forms.py:102 app/forms.py:115
+msgid "Please input post title under 64 length."
+msgstr ""
+
+#: app/forms.py:103 app/forms.py:116
+msgid "Please input post title"
+msgstr ""
+
+#: app/forms.py:105 app/forms.py:118
+msgid "Content"
+msgstr ""
+
+#: app/forms.py:108 app/forms.py:121
+msgid "Please input post content"
+msgstr ""
+
+#: app/forms.py:109 app/templates/base.html:44
+msgid "New Post"
+msgstr ""
+
+#: app/forms.py:122
+msgid "Update"
+msgstr ""
+
+#: app/forms.py:133
+msgid "Send Password Reset e-mail"
+msgstr ""
+
+#: app/forms.py:145
+msgid "Request Password Reset"
+msgstr ""
+
+#: app/routes.py:23 app/routes.py:26
+msgid "Home Page"
+msgstr ""
+
+#: app/routes.py:39
+msgid "Invalid username or password"
+msgstr ""
+
+#: app/routes.py:65
+msgid "Congratulations, you are now a registered user!"
+msgstr ""
+
+#: app/routes.py:99
+msgid "Your changes have been saved."
+msgstr ""
+
+#: app/routes.py:105
+msgid "Edit Profile"
+msgstr ""
+
+#: app/routes.py:119
+msgid "Congratulations, post is created!"
+msgstr ""
+
+#: app/routes.py:122
+msgid "Create Post"
+msgstr ""
+
+#: app/routes.py:136
+msgid "Congratulations, post is updated!"
+msgstr ""
+
+#: app/routes.py:142
+msgid "Edit Post"
+msgstr ""
+
+#: app/routes.py:167 app/routes.py:183
+msgid "User {0} not found."
+msgstr ""
+
+#: app/routes.py:170
+msgid "You cannot follow yourself!"
+msgstr ""
+
+#: app/routes.py:174
+msgid "You are following {0}"
+msgstr ""
+
+#: app/routes.py:186
+msgid "You cannot unfollow yourself!"
+msgstr ""
+
+#: app/routes.py:190
+msgid "You are not following {0}"
+msgstr ""
+
+#: app/routes.py:202
+msgid "Explore Page"
+msgstr ""
+
+#: app/routes.py:217
+msgid "Check your email for the instruction to reset your password"
+msgstr ""
+
+#: app/routes.py:219
+msgid "There is no user with email, {0}"
+msgstr ""
+
+#: app/routes.py:222
+msgid "Reset Password"
+msgstr ""
+
+#: app/routes.py:237
+msgid "Your password has been reset."
+msgstr ""
+
+#: app/routes.py:240
+msgid "Reset Your Password"
+msgstr ""
+
+#: app/templates/403.html:4
+msgid "Forbidden"
+msgstr ""
+
+#: app/templates/403.html:5
+msgid ""
+"You don't have the permission to access the requested resource. It is "
+"either read-protected or not readable by the\n"
+"server."
+msgstr ""
+
+#: app/templates/404.html:4
+msgid "File Not Found"
+msgstr ""
+
+#: app/templates/404.html:5 app/templates/500.html:6
+msgid "Back"
+msgstr ""
+
+#: app/templates/500.html:4
+msgid "An unexpected error has occurred"
+msgstr ""
+
+#: app/templates/500.html:5
+msgid "The administrator has been notified. Sorry for the inconvenience!"
+msgstr ""
+
+#: app/templates/_post.html:13
+msgid "Edit"
+msgstr ""
+
+#: app/templates/base.html:13 app/templates/base.html:34
+msgid "Microblog"
+msgstr ""
+
+#: app/templates/base.html:15
+msgid "Welcome to Microblog"
+msgstr ""
+
+#: app/templates/base.html:39
+msgid "Home"
+msgstr ""
+
+#: app/templates/base.html:40
+msgid "Explore"
+msgstr ""
+
+#: app/templates/base.html:43
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base.html:51
+msgid "Login"
+msgstr ""
+
+#: app/templates/base.html:53
+msgid "Logout"
+msgstr ""
+
+#: app/templates/index.html:7
+#, python-format
+msgid "Hi, %(username)s!"
+msgstr ""
+
+#: app/templates/login.html:11
+msgid "New User?"
+msgstr ""
+
+#: app/templates/login.html:11
+msgid "Click to Register!"
+msgstr ""
+
+#: app/templates/login.html:12
+msgid "Forgot Your Password?"
+msgstr ""
+
+#: app/templates/login.html:12
+msgid "Click to Reset It"
+msgstr ""
+
+#: app/templates/user.html:12
+#, python-format
+msgid "User: %(username)s"
+msgstr ""
+
+#: app/templates/user.html:18
+#, python-format
+msgid "Last seen on: %(when)s"
+msgstr ""
+
+#: app/templates/user.html:24
+msgid "followers"
+msgstr ""
+
+#: app/templates/user.html:24
+msgid "following"
+msgstr ""
+
+#: app/templates/user.html:27
+msgid "Edit your profile"
+msgstr ""
+
+#: app/templates/user.html:29
+msgid "Follow"
+msgstr ""
+
+#: app/templates/user.html:31
+msgid "Unfollow"
+msgstr ""
+
+#: app/templates/email/reset_password.html:1
+#, python-format
+msgid "Dear %(username)s,"
+msgstr ""
+
+#: app/templates/email/reset_password.html:3
+msgid "To reset your password"
+msgstr ""
+
+#: app/templates/email/reset_password.html:5
+msgid "click here"
+msgstr ""
+
+#: app/templates/email/reset_password.html:8
+msgid ""
+"Alternatively, you can paste the following link in your browser's address"
+" bar:"
+msgstr ""
+
+#: app/templates/email/reset_password.html:10
+msgid "If you have not requested a password reset simply ignore this message."
+msgstr ""
+
+#: app/templates/email/reset_password.html:11
+msgid "Sincerely,"
+msgstr ""
+

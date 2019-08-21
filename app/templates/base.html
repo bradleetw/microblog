@@ -10,9 +10,9 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <title>
             {% if title %}
-            {{ title }} - Microblog
+            {{ title }} - {{ _('Microblog') }}
             {% else %}
-            Welcome to Microblog
+            {{ _('Welcome to Microblog') }}
             {% endif %}
         </title>
     {% endblock %}
@@ -31,26 +31,26 @@
             </button>
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='frog.svg') }}" width="30" height="30" alt="">
-                MicroBlog
+                {{ _('Microblog') }}
             </a>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto">
-                    {{ render_nav_item('index', 'Home', use_li=True) }}
-                    {{ render_nav_item('explore', 'Explore', use_li=True) }}
+                    {{ render_nav_item('index', _('Home'), use_li=True) }}
+                    {{ render_nav_item('explore', _('Explore'), use_li=True) }}
                     
                     {% if not current_user.is_anonymous %}
-                        {{ render_nav_item('user', 'Profile', use_li=True, username=current_user.username) }}
-                        {{ render_nav_item('create_post', 'New Post', use_li=True) }}
+                        {{ render_nav_item('user', _('Profile'), use_li=True, username=current_user.username) }}
+                        {{ render_nav_item('create_post', _('New Post'), use_li=True) }}
                     {% endif %}
                 </ul>
             </div>
             <div class="navbar">
                 <ul class="navbar-nav">
                     {% if current_user.is_anonymous %}
-                        {{ render_nav_item('login', 'Login', use_li=True) }}
+                        {{ render_nav_item('login', _('Login'), use_li=True) }}
                     {% else %}
-                        {{ render_nav_item('logout', 'Logout', use_li=True) }}
+                        {{ render_nav_item('logout', _('Logout'), use_li=True) }}
                     {% endif %}
                 </ul>
             </div>

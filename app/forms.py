@@ -4,80 +4,82 @@ from wtforms.fields.core import StringField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, \
     Length
 from app.models import User
+from flask_babel import lazy_gettext as _l
+
 
 
 class LoginForm(FlaskForm):
     username = StringField(
-        label='User Name',
-        validators=[DataRequired(message='Need user name.')],
-        render_kw={'placeholder': 'Please input user name'})
+        label=_l('User Name'),
+        validators=[DataRequired(message=_l('Need user name.'))],
+        render_kw={'placeholder': _l('Please input user name')})
     password = PasswordField(
-        label='Password',
-        validators=[DataRequired(message='Need password')],
-        render_kw={'placeholder': 'Please input password'})
-    remember_me = BooleanField(label='Remember Me')
-    submit = SubmitField(label='Sign In')
+        label=_l('Password'),
+        validators=[DataRequired(message=_l('Need password'))],
+        render_kw={'placeholder': _l('Please input password')})
+    remember_me = BooleanField(label=_l('Remember Me'))
+    submit = SubmitField(label=_l('Sign In'))
 
 
 class RegistrationForm(FlaskForm):
     username = StringField(
-        label='User name',
+        label=_l('User name'),
         validators=[
-            DataRequired(message='User name is must'),
+            DataRequired(message=_l('User name is must')),
             Length(
                 min=6,
                 max=64,
-                message='Must be at least 6 characters, at most 64 characters.'
+                message=_l('Must be at least 6 characters, at most 64 characters.')
             )
         ],
-        description='Please input User name between 6 ~ 64 characters.',
-        render_kw={'placeholder': 'Please input user name'})
+        description=_l('Please input User name between 6 ~ 64 characters.'),
+        render_kw={'placeholder': _l('Please input user name')})
     email = StringField(
-        label='Email',
-        validators=[DataRequired(message='Email address is must'),
+        label=_l('Email'),
+        validators=[DataRequired(message=_l('Email address is must')),
                     Email()],
-        description='Please input email address under 120 length.',
-        render_kw={'placeholder': 'Please input email address'})
+        description=_l('Please input email address under 120 length.'),
+        render_kw={'placeholder': _l('Please input email address')})
     password = PasswordField(
-        label='Password',
-        validators=[DataRequired(message='Password is must')],
-        render_kw={'placeholder': 'Please input password'})
+        label=_l('Password'),
+        validators=[DataRequired(message=_l('Password is must'))],
+        render_kw={'placeholder': _l('Please input password')})
     password2 = PasswordField(
-        label='Repeat Password',
+        label=_l('Repeat Password'),
         validators=[DataRequired(), EqualTo('password')],
-        render_kw={'placeholder': 'Please input password again'})
-    submit = SubmitField('Register')
+        render_kw={'placeholder': _l('Please input password again')})
+    submit = SubmitField(_l('Register'))
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError(_l('Please use a different username.'))
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError(_l('Please use a different email address.'))
 
 
 class EditProfileForm(FlaskForm):
     username = StringField(
-        label='User name',
+        label=_l('User name'),
         validators=[
-            DataRequired(message='User name is must'),
+            DataRequired(message=_l('User name is must')),
             Length(
                 min=6,
                 max=64,
-                message='Must be at least 6 characters, at most 64 characters.'
+                message=_l('Must be at least 6 characters, at most 64 characters.')
             )
         ],
-        description='Please input User name between 6 ~ 64 characters.',
-        render_kw={'placeholder': 'Please input user name'})
+        description=_l('Please input User name between 6 ~ 64 characters.'),
+        render_kw={'placeholder': _l('Please input user name')})
     about_me = TextAreaField(
-        label='About me',
-        validators=[Length(max=140, message='Must be at most 140 characters')],
-        description='Please input post content under 140 length.',
-        render_kw={'placeholder': 'Please input self-content'})
-    submit = SubmitField('Submit')
+        label=_l('About me'),
+        validators=[Length(max=140, message=_l('Must be at most 140 characters'))],
+        description=_l('Please input post content under 140 length.'),
+        render_kw={'placeholder': _l('Please input self-content')})
+    submit = SubmitField(_l('Submit'))
 
     def __init__(self, original_username, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
@@ -87,57 +89,57 @@ class EditProfileForm(FlaskForm):
         if username.data != self.original_username:
             user = User.query.filter_by(username=username.data).first()
             if user is not None:
-                raise ValidationError('Please use a different username.')
+                raise ValidationError(_l('Please use a different username.'))
 
 
 class PostForm(FlaskForm):
-    title = StringField(label='Post Title',
+    title = StringField(label=_l('Post Title'),
                         validators=[
-                            DataRequired(message='Need Post title.'),
+                            DataRequired(message=_l('Need Post title.')),
                             Length(max=64,
-                                   message='Must be at most 64 characters')
+                                   message=_l('Must be at most 64 characters'))
                         ],
-                        description='Please input post title under 64 length.',
-                        render_kw={'placeholder': 'Please input post title'})
+                        description=_l('Please input post title under 64 length.'),
+                        render_kw={'placeholder': _l('Please input post title')})
     body = TextAreaField(
-        label='Content',
-        validators=[Length(max=140, message='Must be at most 140 characters')],
-        description='Please input post content under 140 length.',
-        render_kw={'placeholder': 'Please input post content'})
-    submit = SubmitField('New Post')
+        label=_l('Content'),
+        validators=[Length(max=140, message=_l('Must be at most 140 characters'))],
+        description=_l('Please input post content under 140 length.'),
+        render_kw={'placeholder': _l('Please input post content')})
+    submit = SubmitField(_l('New Post'))
 
 
 class UpdatePostForm(FlaskForm):
-    title = StringField(label='Post Title',
-                        validators=[DataRequired(message='Need Post title.')],
-                        description='Please input post title under 64 length.',
-                        render_kw={'placeholder': 'Please input post title'})
+    title = StringField(label=_l('Post Title'),
+                        validators=[DataRequired(message=_l('Need Post title.'))],
+                        description=_l('Please input post title under 64 length.'),
+                        render_kw={'placeholder': _l('Please input post title')})
     body = TextAreaField(
-        label='Content',
-        validators=[Length(max=140, message='Must be at most 140 characters')],
-        description='Please input post content under 140 length.',
-        render_kw={'placeholder': 'Please input post content'})
-    submit = SubmitField('Update')
-    # delete = SubmitField('Delete')
+        label=_l('Content'),
+        validators=[Length(max=140, message=_l('Must be at most 140 characters'))],
+        description=_l('Please input post content under 140 length.'),
+        render_kw={'placeholder': _l('Please input post content')})
+    submit = SubmitField(_l('Update'))
+    # delete = SubmitField(_l('Delete'))
 
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField(
-        label='Email',
-        validators=[DataRequired(message='Email address is must'),
+        label=_l('Email'),
+        validators=[DataRequired(message=_l('Email address is must')),
                     Email()],
-        description='Please input email address under 120 length.',
-        render_kw={'placeholder': 'Please input email address'})
-    submit = SubmitField('Send Password Reset e-mail')
+        description=_l('Please input email address under 120 length.'),
+        render_kw={'placeholder': _l('Please input email address')})
+    submit = SubmitField(_l('Send Password Reset e-mail'))
 
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField(
-        label='Password',
-        validators=[DataRequired(message='Password is must')],
-        render_kw={'placeholder': 'Please input password'})
+        label=_l('Password'),
+        validators=[DataRequired(message=_l('Password is must'))],
+        render_kw={'placeholder': _l('Please input password')})
     password2 = PasswordField(
-        label='Repeat Password',
+        label=_l('Repeat Password'),
         validators=[DataRequired(), EqualTo('password')],
-        render_kw={'placeholder': 'Please input password again'})
-    submit = SubmitField('Request Password Reset')
+        render_kw={'placeholder': _l('Please input password again')})
+    submit = SubmitField(_l('Request Password Reset'))

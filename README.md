@@ -22,6 +22,8 @@
 
 ## [CH12: Dates and times](</12_dateandtime.md>)
 
+## [CH13: I18n and L10n](</13_I18N_L10N.md>)
+
 ## Others: Flask 提供的元件
 
 1. [Command Line Interface](<http://flask.pocoo.org/docs/1.0/api/?highlight=config#command-line-interface>)
